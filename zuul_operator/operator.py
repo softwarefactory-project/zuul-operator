@@ -14,6 +14,7 @@
 
 import asyncio
 import collections
+import os
 
 import kopf
 import pykube
@@ -25,6 +26,15 @@ from .zuul import Zuul
 ConfigResource = collections.namedtuple('ConfigResource', [
     'attr', 'namespace', 'zuul_name', 'resource_name'])
 
+WATCH_NAMESPACE = os.environ.get("WATCH_NAMESPACE")
+
+
+def get_namespaces(api):
+    if WATCH_NAMESPACE:
+        return [WATCH_NAMESPACE]
+    else:
+        return map(lambda n: n.name, objects.Namespace.objects(api))
+
 
 def memoize_secrets(memo, logger):
     # (zuul_namespace, zuul) -> list of resources
@@ -33,21 +43,21 @@ def memoize_secrets(memo, logger):
     # lookup all zuuls and update configmaps
 
     api = pykube.HTTPClient(pykube.KubeConfig.from_env())
-    for namespace in objects.Namespace.objects(api):
+    for namespace in get_namespaces(api):
         for zuul in objects.ZuulObject.objects(api).filter(
-                namespace=namespace.name):
+                namespace=namespace):
             resources = new_resources.\
-                setdefault((namespace.name, zuul.name), [])
+                setdefault((namespace, zuul.name), [])
             # Zuul tenant config
             secret = zuul.obj['spec']['scheduler']['config']['secretName']
             res = ConfigResource('spec.scheduler.config.secretName',
-                                 namespace.name, zuul.name, secret)
+                                 namespace, zuul.name, secret)
             resources.append(res)
 
             # Nodepool config
             secret = zuul.obj['spec']['launcher']['config']['secretName']
             res = ConfigResource('spec.launcher.config.secretName',
-                                 namespace.name, zuul.name, secret)
+                                 namespace, zuul.name, secret)
             resources.append(res)
     # Mutate the global instance
     memo.config_resources.clear()
@@ -91,6 +101,8 @@ def update_secret(name, namespace, logger, memo, new, **kwargs):
 
 @kopf.on.create('zuuls', backoff=10)
 def create_fn(spec, name, namespace, logger, memo, **kwargs):
+    if WATCH_NAMESPACE and WATCH_NAMESPACE != namespace:
+        return
     logger.info(f"Create zuul {namespace}/{name}")
 
     zuul = Zuul(namespace, name, logger, spec)
