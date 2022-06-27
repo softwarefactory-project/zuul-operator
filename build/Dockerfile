@@ -13,14 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM docker.io/opendevorg/python-builder:3.8 as builder
-
-COPY . /tmp/src
-RUN assemble
-
-FROM docker.io/opendevorg/python-base:3.8
-
-COPY --from=builder /output/ /output
-RUN /output/install-from-bindep
-
-ENTRYPOINT ["/usr/local/bin/zuul-operator"]
+FROM docker.io/opendevorg/python-builder:3.7
+ADD requirements.txt /
+RUN pip install -r /requirements.txt
+ADD zuul_operator /zuul_operator
+CMD PYTHONPATH=/ kopf run /zuul_operator/operator.py --verbose

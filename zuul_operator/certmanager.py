@@ -16,8 +16,8 @@ import time
 
 import pykube
 
-from . import objects
-from . import utils
+from zuul_operator import objects
+from zuul_operator import utils
 
 
 class CertManager:

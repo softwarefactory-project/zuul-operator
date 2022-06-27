@@ -24,7 +24,7 @@ from kubernetes.client import Configuration
 from kubernetes.client.api import core_v1_api
 from kubernetes.stream import stream
 
-from . import objects
+from zuul_operator import objects
 
 
 def object_from_dict(data):

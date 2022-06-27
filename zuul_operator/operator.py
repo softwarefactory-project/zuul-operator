@@ -12,15 +12,14 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import asyncio
 import collections
 import os
 
 import kopf
 import pykube
 
-from . import objects
-from .zuul import Zuul
+from zuul_operator import objects
+from zuul_operator.zuul import Zuul
 
 
 ConfigResource = collections.namedtuple('ConfigResource', [
@@ -175,9 +174,3 @@ def update_fn(name, namespace, logger, old, new, memo, **kwargs):
         zuul.create_zuul()
 
     memoize_secrets(memo, logger)
-
-
-class ZuulOperator:
-    def run(self):
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(kopf.operator())

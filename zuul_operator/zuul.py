@@ -21,11 +21,11 @@ import jinja2
 import pykube
 import yaml
 
-from . import objects
-from . import utils
-from . import certmanager
-from . import pxc
-from . import zookeeper
+from zuul_operator import objects
+from zuul_operator import utils
+from zuul_operator import certmanager
+from zuul_operator import pxc
+from zuul_operator import zookeeper
 
 
 class Zuul:
