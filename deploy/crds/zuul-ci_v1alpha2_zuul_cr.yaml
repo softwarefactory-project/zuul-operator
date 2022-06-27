@@ -23,3 +23,5 @@ spec:
   externalConfig:
     kubernetes:
       secretName: nodepool-kube-config
+#  database:
+#    allowUnsafeConfig: true
