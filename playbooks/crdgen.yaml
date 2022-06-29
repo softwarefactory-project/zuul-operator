@@ -1,0 +1,11 @@
+- hosts: all
+  tasks:
+    - include_role:
+        name: ensure-go
+      vars:
+        go_version: 1.18.3
+
+    - include_role:
+        name: render-diff
+      vars:
+        render_command: env "PATH={{ ansible_env.PATH }}:/usr/local/go/bin" make manifests

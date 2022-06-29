@@ -8,3 +8,12 @@ id_rsa
 id_rsa.pub
 *.patch
 *.egg-info/
+
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+bin
+testbin/*

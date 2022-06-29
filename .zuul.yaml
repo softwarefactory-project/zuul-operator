@@ -90,11 +90,18 @@
       nodes: []
     vars: *image_vars
 
+- job:
+    description: Generate the zuul operator CRD
+    name: zuul-operator-generate-crd
+    run: playbooks/crdgen.yaml
+    nodeset: ubuntu-focal
+
 - project:
     check:
       jobs:
         - tox-linters
         - zuul-tox-docs
+        - zuul-operator-generate-crd
         - zuul-operator-build-image
         - zuul-operator-functional-k8s:
             dependencies: zuul-operator-build-image
@@ -102,6 +109,7 @@
       jobs:
         - tox-linters
         - zuul-tox-docs
+        - zuul-operator-generate-crd
         - zuul-operator-upload-image
         - zuul-operator-functional-k8s:
             dependencies: zuul-operator-upload-image
